@@ -1,5 +1,5 @@
-### Install SSH Server on all login nodes and compute nodes
-
+# Enable communication between nodes
+## Install SSH Server on all login nodes and compute nodes
 ```
 sudo apt-get update
 sudo apt-get install openssh-server
@@ -9,7 +9,7 @@ sudo systemctl status ssh
 sudo ufw allow ssh
 ```
 
-### Enable passwordless entry on compute nodes from login node
+## Enable passwordless entry on compute nodes from login node
 ```
 # On the login node, generate a new SSH key pair
 ssh-keygen -t rsa
@@ -23,7 +23,7 @@ ssh-copy-id user_id@hostname
 # Test the connection
 ssh user_id@hostname
 ```
-### Set alias for the compute nodes
+## Set alias for the compute nodes
 ```
 # Editing the hosts file
 sudo nano /etc/hosts
@@ -32,8 +32,8 @@ ip_address_2 compute_node_1
 ip_address_3 compute_node_2
 ```
 
-### Setup Network File System
-#### On the login node
+# Setup Network File System
+## On the login node
 ```
 # install nfs server
 sudo apt-get install nfs-server
@@ -58,7 +58,7 @@ sudo chown user_id /nfs
 sudo ufw allow from any to any port nfs
 ```
 
-#### On the compute nodes
+## On the compute nodes
 ```
 # install nfs client
 sudo apt-get install nfs-client
@@ -79,7 +79,7 @@ sudo systemctl daemon-reload
 sudo mount -a
 ```
 
-#### Test the NFS
+## Test the NFS
 ```
 # create a file in the shared directory on the login node
 touch /nfs/test.txt
@@ -88,21 +88,21 @@ touch /nfs/test.txt
 ls /nfs
 ``` 
 
-### Install Slurm on the login node
-#### Create Munge User
+# Setup Slurm on the login node
+## Create Munge User
 ```
 export MUNGEUSER=1001
 sudo groupadd -g $MUNGEUSER munge
 sudo useradd -m -c "MUNGE Uid 'N' Gid Emporium" -d /var/lib/munge -u $MUNGEUSER -g munge -s /sbin/nologin munge 
 ```
-#### Create Slurm User
+## Create Slurm User
 ```
 export SLURMUSER=1002
 sudo groupadd -g $SLURMUSER slurm
 sudo useradd -m -c "SLURM workload manager" -d /var/lib/slurm -u $SLURMUSER -g slurm -s /bin/bash slurm
 ```
 
-#### Install Munge
+## Install Munge
 ```
 sudo apt-get install -y munge
 sudo chown -R munge: /etc/munge/ /var/log/munge/ /var/lib/munge/ /run/munge/
@@ -113,14 +113,14 @@ sudo systemctl enable munge
 sudo systemctl start munge
 ```
 
-#### Install slurm and associated components on slurm controller (Login) node
+## Install slurm and associated components on slurm controller (Login) node
 ```
 sudo apt-get install mariadb-server
 sudo apt-get install slurmdbd
 sudo apt-get install slurm-wlm
 ```
 
-#### Create and configure the slurm_acct_db database: (Login Node)
+## Create and configure the slurm_acct_db database: (Login Node)
 ```
 # Login as root
 su
@@ -173,30 +173,30 @@ sudo ufw allow 6818
 sudo ufw allow 6819
 ```
 
-#### Make necessary folders and files
+## Make necessary folders and files
 ```
-mkdir /var/spool/slurmctld
-chown slurm:slurm /var/spool/slurmctld
-chmod 755 /var/spool/slurmctld
-mkdir  /var/log/slurm
-touch /var/log/slurm/slurmctld.log
-touch /var/log/slurm/slurm_jobacct.log /var/log/slurm/slurm_jobcomp.log
-chown -R slurm:slurm /var/log/slurm/
-chmod 755 /var/log/slurm
+sudo mkdir /var/spool/slurmctld
+sudo chown slurm:slurm /var/spool/slurmctld
+sudo chmod 755 /var/spool/slurmctld
 
-#Search and change location of PID file
+sudo mkdir /var/log/slurm
+sudo touch /var/log/slurm/slurmctld.log
+sudo touch /var/log/slurm/slurm_jobacct.log 
+sudo touch /var/log/slurm/slurm_jobcomp.log
+sudo chown -R slurm:slurm /var/log/slurm/
+sudo chmod 755 /var/log/slurm
 
 
-# Edit the file and change PIDFile path to /run/slurm/slurmctld.pid
+## Edit the slurmctld.service file and change PIDFile path to /run/slurm/slurmctld.pid
 nano /usr/lib/systemd/system/slurmctld.service
 
-# Edit the file and change PIDFile path to /run/slurm/slurmdbd.pid
+## Edit the slurmdbd.service file and change PIDFile path to /run/slurm/slurmdbd.pid
 nano /usr/lib/systemd/system/slurmdbd.service
 
-# Edit the file and change PIDFile path to /run/slurm/slurmd.pid
+## Edit the slurmd.service file and change PIDFile path to /run/slurm/slurmd.pid
 nano /usr/lib/systemd/system/slurmd.service
 
-# Run the following as root
+## Run the following as root
 echo CgroupMountpoint=/sys/fs/cgroup >> /etc/slurm/cgroup.conf
 
 # Check the available compute nodes
@@ -210,114 +210,130 @@ sudo systemctl enable slurmdbd
 sudo systemctl start slurmdbd
 sudo systemctl enable slurmctld
 sudo systemctl start slurmctld
-
+```
 # Check the status of the services
+```
 systemctl status slurmdbd
 systemctl status slurmctld
-
-#If any of the services are not active, try rebooting the PC and then check again. Hopefully that will do the job.
 ```
 
-### Installing Slurm on the Compute Nodes
+If any of the services are not active, try rebooting the PC and then check again. Hopefully that will do the job.
 
-#### Create Munge User
+# Slurm setup on the Compute Nodes
+
+## Create Munge User
 ```
 export MUNGEUSER=1001 
 sudo groupadd -g $MUNGEUSER munge 
 sudo useradd -m -c "MUNGE Uid 'N' Gid Emporium" -d /var/lib/munge -u $MUNGEUSER -g munge -s /sbin/nologin munge 
 ```
 
-#### Create Slurm User
+## Create Slurm User
 ```
 export SLURMUSER=1002 
 sudo groupadd -g $SLURMUSER slurm 
 sudo useradd -m -c "SLURM workload manager" -d /var/lib/slurm -u $SLURMUSER -g slurm -s /bin/bash slurm
 ```
 
-#### Install Munge
+## Install Munge
 ```
 sudo apt-get install -y munge
+```
 
-# Now copy the munge authentication key from /nfs/slurm/ on every node.
-sudo scp /nfs/slurm/munge.key /etc/munge/
+## Copy the munge authentication key from /nfs/slurm/ on compute node.
+```
+sudo cp /nfs/slurm/munge.key /etc/munge/
 sudo chown munge:munge /etc/munge/munge.key
 sudo chmod 400 /etc/munge/munge.key
+```
+## Start Munge Service
+```
 sudo systemctl enable munge
 sudo systemctl start munge
 ```
 
-#### Slurm Installation
+## Install Slurm
 ```
 sudo apt-get install slurm-wlm
+```
 
-# Copy slurm.conf and slurmdbd.conf from the login node to the compute nodes.
-# Copy both slurm.conf and slurmdbd.conf to each node at /etc/slurm
-sudo scp /nfs/slurm/slurm.conf /etc/slurm
-sudo scp /nfs/slurm/slurmdbd.conf /etc/slurm
+## Copy slurm.conf file from /nfs/slurm/ to /etc/slurm/
+```
+sudo cp /nfs/slurm/slurm.conf /etc/slurm/
+```
 
-# On the compute nodes: (login as root and then run all the below commands till 3.5.10)
-su
-mkdir /var/spool/slurmd 
-chown slurm: /var/spool/slurmd
-chmod 755 /var/spool/slurmd
-mkdir /var/log/slurm/
-touch /var/log/slurm/slurmd.log
-chown -R slurm:slurm /var/log/slurm/slurmd.log
-chmod 755 /var/log/slurm
-mkdir /run/slurm
-touch /run/slurm/slurmd.pid
-chown slurm /run/slurm
-chown slurm:slurm /run/slurm
-chmod -R 770 /run/slurm
+## Create the required directory structure
+```
+sudo mkdir /var/spool/slurmd 
+sudo chown slurm: /var/spool/slurmd
+sudo chmod 755 /var/spool/slurmd
 
-# Edit the file and change PIDFile path to /run/slurm/slurmd.pid
+sudo mkdir /var/log/slurm/
+sudo touch /var/log/slurm/slurmd.log
+sudo chown -R slurm:slurm /var/log/slurm/slurmd.log
+sudo chmod 755 /var/log/slurm
+
+sudo mkdir /run/slurm
+sudo touch /run/slurm/slurmd.pid
+sudo chown slurm /run/slurm
+sudo chown slurm:slurm /run/slurm
+sudo chmod -R 770 /run/slurm
+```
+
+## Edit the slurmd.service file and change PIDFile path to /run/slurm/slurmd.pid
+```
 nano /usr/lib/systemd/system/slurmd.service
 
 echo CgroupMountpoint=/sys/fs/cgroup >> /etc/slurm/cgroup.conf
 slurmd -C
+```
 
-# Start the slurmd service
+## Start the slurmd service
+```
 systemctl enable slurmd.service 
 systemctl start slurmd.service 
 systemctl status slurmd.service
-# If the service is active, you are all good, otherwise just reboot the node and reconnect the NFS. Then check the status of slurmd.service. In any case, a reboot at this stage is necessary.
-# The following command can check the connectivity with the controller node:
+```
+If the service is active, you are all good, otherwise just reboot the node and reconnect the NFS. Then check the status of slurmd.service. In any case, a reboot at this stage is necessary.
+
+## Check the connectivity with the controller node:
+```
 scontrol ping
 ```
 
-## Common Commands for SLURM 
+# Common Commands for SLURM 
 
-### Update the conf files
+## Update the conf files
 ```
 sudo nano /etc/slurm/slurm.conf
 sudo nano /etc/slurm/slurmdbd.conf
 ```
 
-### Copy slurm.conf file from /etc/slurm/ to /nfs/slurm/
+## Copy slurm.conf file from /etc/slurm/ to /nfs/slurm/
 ```
 sudo cp /etc/slurm/slurm.conf /nfs/slurm/
 ```
 
-### Copy slurm.conf file from /nfs/slurm/ to /etc/slurm/
+## Copy slurm.conf file from /nfs/slurm/ to /etc/slurm/
 ```
 sudo cp /nfs/slurm/slurm.conf /etc/slurm/
 ```
 
-### Restart the services
+## Restart the services
 ```
 sudo systemctl restart slurmdbd
 sudo systemctl restart slurmctld
 sudo systemctl restart slurmd
 ```
 
-### Check service status
+## Check service status
 ```
 systemctl status slurmdbd
 systemctl status slurmctld
 systemctl status slurmd
 ```
 
-### View logs 
+## View logs 
 ```
 sudo cat /var/log/slurm/slurmdbd.log
 sudo cat /var/log/slurm/slurmctld.log
