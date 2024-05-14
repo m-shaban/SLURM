@@ -293,16 +293,14 @@ sudo nano /etc/slurm/slurm.conf
 sudo nano /etc/slurm/slurmdbd.conf
 ```
 
-### Copy conf files from /etc/slurm/ to /nfs/slurm/
+### Copy slurm.conf file from /etc/slurm/ to /nfs/slurm/
 ```
 sudo cp /etc/slurm/slurm.conf /nfs/slurm/
-sudo cp /etc/slurm/slurmdbd.conf /nfs/slurm/
 ```
 
-### Copy conf files from /nfs/slurm/ to /etc/slurm/
+### Copy slurm.conf file from /nfs/slurm/ to /etc/slurm/
 ```
 sudo cp /nfs/slurm/slurm.conf /etc/slurm/
-sudo cp /nfs/slurm/slurmdbd.conf  /etc/slurm/
 ```
 
 ### Restart the services
