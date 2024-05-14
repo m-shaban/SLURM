@@ -186,6 +186,13 @@ sudo touch /var/log/slurm/slurm_jobcomp.log
 sudo chown -R slurm:slurm /var/log/slurm/
 sudo chmod 755 /var/log/slurm
 
+sudo mkdir /run/slurm
+sudo touch /run/slurm/slurmctld.pid
+sudo touch /run/slurm/slurmdbd.pid
+sudo touch /run/slurm/slurmd.pid
+sudo chown slurm /run/slurm
+sudo chown slurm:slurm /run/slurm
+sudo chmod -R 770 /run/slurm
 
 ## Edit the slurmctld.service file and change PIDFile path to /run/slurm/slurmctld.pid
 nano /usr/lib/systemd/system/slurmctld.service
@@ -199,11 +206,11 @@ nano /usr/lib/systemd/system/slurmd.service
 ## Run the following as root
 echo CgroupMountpoint=/sys/fs/cgroup >> /etc/slurm/cgroup.conf
 
-# Check the available compute nodes
+## Check the available compute nodes
 slurmd -C
 ```
 
-#### Start SLURM Services on Login Node
+## Start SLURM Services on Login Node
 ``` 
 sudo systemctl daemon-reload
 sudo systemctl enable slurmdbd
@@ -211,7 +218,7 @@ sudo systemctl start slurmdbd
 sudo systemctl enable slurmctld
 sudo systemctl start slurmctld
 ```
-# Check the status of the services
+## Check the status of the services
 ```
 systemctl status slurmdbd
 systemctl status slurmctld
