@@ -285,41 +285,43 @@ systemctl status slurmd.service
 scontrol ping
 ```
 
-### Common Commands for SLURM 
+## Common Commands for SLURM 
+
+### Update the conf files
 ```
-# update the slurm.conf file
 sudo nano /etc/slurm/slurm.conf
-
-# update the slurmdbd.conf file
 sudo nano /etc/slurm/slurmdbd.conf
+```
 
-# copy conf files to /nfs/slurm/
+### Copy conf files from /etc/slurm/ to /nfs/slurm/
+```
 sudo cp /etc/slurm/slurm.conf /nfs/slurm/
 sudo cp /etc/slurm/slurmdbd.conf /nfs/slurm/
+```
 
-# copy conf file to /nfs/slurm/
+### Copy conf files from /nfs/slurm/ to /etc/slurm/
+```
 sudo cp /nfs/slurm/slurm.conf /etc/slurm/
 sudo cp /nfs/slurm/slurmdbd.conf  /etc/slurm/
+```
 
-
-# restart the slurmdbd
+### Restart the services
+```
 sudo systemctl restart slurmdbd
-systemctl status slurmdbd
-
-# restart the slurm controller
 sudo systemctl restart slurmctld
-systemctl status slurmctld
-
-# restart the slurmd compute node
 sudo systemctl restart slurmd
+```
+
+### Check service status
+```
+systemctl status slurmdbd
+systemctl status slurmctld
 systemctl status slurmd
+```
 
-# view logs for slurmdbd
-sudo cat /var/log/slurm/slurmcdbd.log
-
-# view logs for slurmctld
+### View logs 
+```
+sudo cat /var/log/slurm/slurmdbd.log
 sudo cat /var/log/slurm/slurmctld.log
-
-# view logs for slurmd
 sudo cat /var/log/slurm/slurmd.log
 ```
